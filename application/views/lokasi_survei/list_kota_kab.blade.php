@@ -1,0 +1,92 @@
+@extends('include_backend/template_backend')
+
+@php
+$ci = get_instance();
+@endphp
+
+@section('style')
+<link href="{{ TEMPLATE_BACKEND_PATH }}plugins/custom/datatables/datatables.bundle.css" rel="stylesheet" type="text/css" />
+@endsection
+
+@section('content')
+
+<div class="container-fluid">
+    <div>
+    {!! anchor(base_url().'lokasi-survei', 'Kembali', ['class' => 'btn btn-light-primary font-weight-bold shadow mb-5']) !!}
+    </div>
+    <div class="card shadow" data-aos="fade-up">
+        <div class="card-header bg-secondary font-weight-bold">
+            {{ $title }}
+        </div>
+        <div class="card-body">
+            <?php 
+            /*if ($this->session->flashdata('message')){
+                echo $this->session->flashdata('message');
+            }*/
+            ?>
+            <input type="hidden" name="id_provinsi" id="id_provinsi" value="{{ $ci->uri->segment(3) }}">
+            <div class="text-right mb-3">
+                <a href="<?php echo base_url() . 'lokasi-survei/create-kota-kabupaten/' . $id_propinsi ?>" class="btn btn-primary btn-sm font-weight-bold">Tambah Kota/Kabupaten</a>
+            </div>
+            <div class="table-responsive">
+                <table id="table" class="table" cellspacing="0" width="100%">
+                    <thead class="bg-secondary">
+                        <tr>
+                            <th>No.</th>
+                            <th>Kota/ Kabupaten</th>
+                            <th></th>
+                            <th></th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+
+@endsection
+
+@section('javascript')
+<script src="{{ TEMPLATE_BACKEND_PATH }}plugins/custom/datatables/datatables.bundle.js"></script>
+<script>
+$(document).ready(function() {
+    table = $('#table').DataTable({
+
+        "processing": true,
+        "serverSide": true,
+        "order": [],
+        "language": {
+            "processing": '<i class="fa fa-spinner fa-spin fa-3x fa-fw"></i><span class="sr-only">Loading...</span> ',
+        },
+        "lengthMenu": [
+            [5, 10, 25, 50, 100],
+            [5, 10, 25, 50, 100]
+        ],
+        "pageLength": 10,
+        "ajax": {
+            "url": "{{ base_url() }}lokasi-survei/ajax-list-kota-kab",
+            "type": "POST",
+            "data": function(data) {
+                data.id_provinsi = $('#id_provinsi').val();
+            }
+        },
+
+        "columnDefs": [{
+            "targets": [-1],
+            "orderable": false,
+        }, ],
+
+    });
+});
+
+$('#btn-filter').click(function() {
+    table.ajax.reload();
+});
+$('#btn-reset').click(function() {
+    $('#form-filter')[0].reset();
+    table.ajax.reload();
+});
+</script>
+@endsection
